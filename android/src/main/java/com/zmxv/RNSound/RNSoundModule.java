@@ -29,7 +29,7 @@ import java.util.TimerTask;
 import android.util.Log;
 
 public class RNSoundModule extends ReactContextBaseJavaModule implements AudioManager.OnAudioFocusChangeListener {
-  Map<Double, MediaPlayer> playerPool = new HashMap<>();
+  final Map<Double, MediaPlayer> playerPool = new HashMap<>();
   ReactApplicationContext context;
   final static Object NULL = null;
   String category;
