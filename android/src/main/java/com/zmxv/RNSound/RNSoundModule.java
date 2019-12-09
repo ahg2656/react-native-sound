@@ -23,6 +23,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.util.Log;
 
@@ -35,6 +37,8 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
   Double focusedPlayerKey;
   Boolean wasPlayingBeforeFocusChange = false;
 
+  private Timer timer;
+
   public RNSoundModule(ReactApplicationContext context) {
     super(context);
     this.context = context;
@@ -46,9 +50,7 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     WritableMap params = Arguments.createMap();
     params.putBoolean("isPlaying", isPlaying);
     params.putDouble("playerKey", playerKey);
-    reactContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-            .emit("onPlayChange", params);
+    sendEvent("onPlayChange", params)
   }
 
   @Override
@@ -213,6 +215,7 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     MediaPlayer player = this.playerPool.get(key);
     if (player == null) {
       setOnPlay(false, key);
+      startTimer();
       if (callback != null) {
           callback.invoke(false);
       }
@@ -238,6 +241,7 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
       public synchronized void onCompletion(MediaPlayer mp) {
         if (!mp.isLooping()) {
           setOnPlay(false, key);
+          stopTimer();
           if (callbackWasCalled) return;
           callbackWasCalled = true;
           try {
@@ -458,5 +462,33 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     final Map<String, Object> constants = new HashMap<>();
     constants.put("IsAndroid", true);
     return constants;
+  }
+
+  private void startTimer(){
+    timer = new Timer();
+    timer.scheduleAtFixedRate(new TimerTask() {
+      @Override
+      public void run() {
+        if (player.isPlaying()) {
+          WritableMap body = Arguments.createMap();
+          body.putDouble("currentTime", player.getCurrentPosition() * .001);
+          sendEvent("audioCurrentTime", body);
+        }
+      }
+    }, 0, 1000);
+  }
+
+  private void stopTimer(){
+    if (timer != null) {
+      timer.cancel();
+      timer.purge();
+      timer = null;
+    }
+  }
+
+  private void sendEvent(String eventName, Object params) {
+    getReactApplicationContext()
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit(eventName, params);
   }
 }
