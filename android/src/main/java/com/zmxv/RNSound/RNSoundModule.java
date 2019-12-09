@@ -465,7 +465,7 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
   }
 
   private void startTimer(){
-    MediaPlayer player = this.playerPool.get(key);
+    MediaPlayer player = this.playerPool.get(this.focusedPlayerKey);
     timer = new Timer();
     timer.scheduleAtFixedRate(new TimerTask() {
       @Override
