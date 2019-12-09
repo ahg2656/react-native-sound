@@ -50,7 +50,7 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     WritableMap params = Arguments.createMap();
     params.putBoolean("isPlaying", isPlaying);
     params.putDouble("playerKey", playerKey);
-    sendEvent("onPlayChange", params)
+    sendEvent("onPlayChange", params);
   }
 
   @Override
