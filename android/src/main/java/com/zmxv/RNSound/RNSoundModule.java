@@ -469,7 +469,7 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     timer.scheduleAtFixedRate(new TimerTask() {
       @Override
       public void run() {
-        if (player.isPlaying()) {
+        if (mp.isPlaying()) {
           WritableMap body = Arguments.createMap();
           body.putDouble("currentTime", mp.getCurrentPosition() * .001);
           sendEvent("audioCurrentTime", body);
