@@ -215,7 +215,7 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     MediaPlayer player = this.playerPool.get(key);
     if (player == null) {
       setOnPlay(false, key);
-      startTimer();
+      startTimer(player);
       if (callback != null) {
           callback.invoke(false);
       }
@@ -464,15 +464,14 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     return constants;
   }
 
-  private void startTimer(){
-    MediaPlayer player = this.playerPool.get(this.focusedPlayerKey);
+  private void startTimer(MediaPlayer mp){
     timer = new Timer();
     timer.scheduleAtFixedRate(new TimerTask() {
       @Override
       public void run() {
         if (player.isPlaying()) {
           WritableMap body = Arguments.createMap();
-          body.putDouble("currentTime", player.getCurrentPosition() * .001);
+          body.putDouble("currentTime", mp.getCurrentPosition() * .001);
           sendEvent("audioCurrentTime", body);
         }
       }
