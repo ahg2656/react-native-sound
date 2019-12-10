@@ -215,7 +215,6 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     MediaPlayer player = this.playerPool.get(key);
     if (player == null) {
       setOnPlay(false, key);
-      startTimer(player);
       if (callback != null) {
           callback.invoke(false);
       }
