@@ -270,6 +270,9 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     });
     player.start();
     setOnPlay(true, key);
+    if (timer == null) {
+      startTimer(key);
+    }
   }
 
   @ReactMethod
@@ -464,15 +467,16 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     return constants;
   }
 
-  private void startTimer(final MediaPlayer mp){
+  private void startTimer(final Double key){
+    final MediaPlayer player = this.playerPool.get(key);
     timer = new Timer();
     timer.scheduleAtFixedRate(new TimerTask() {
       @Override
       public void run() {
-        if (mp.isPlaying()) {
+        if (player.isPlaying()) {
           WritableMap body = Arguments.createMap();
-          body.putDouble("currentTime", mp.getCurrentPosition() * .001);
-          sendEvent("audioCurrentTime", body);
+          body.putDouble("currentTime", player.getCurrentPosition() * .001);
+          sendEvent("playingCurrentTime", body);
         }
       }
     }, 0, 1000);

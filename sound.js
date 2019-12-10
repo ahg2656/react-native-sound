@@ -66,16 +66,18 @@ function Sound(filename, basePath, onError, options) {
       if (typeof props.numberOfChannels === "number") {
         this._numberOfChannels = props.numberOfChannels;
       }
-
-      if (this.currentTimeSubscription) this.currentTimeSubscription.remove();
-      this.currentTimeSubscription = NativeEventEmitter.addListener(
-        "audioCurrentTime",
+      ////////////////////////////////////////////////////////////////////
+      // android only
+      if (this.playingSubscription) this.playingSubscription.remove();
+      this.playingSubscription = eventEmitter.addListener(
+        "playingCurrentTime",
         data => {
-          if (this.onCurrentTime) {
-            this.onCurrentTime(data);
+          if (this.onPlaying) {
+            this.onPlaying(data);
           }
         }
       );
+      ////////////////////////////////////////////////////////////////////
     }
     if (error === null) {
       this._loaded = true;
@@ -236,7 +238,7 @@ Sound.prototype.setSpeakerphoneOn = function(value) {
 };
 
 Sound.prototype.removeListeners = function() {
-  if (this.currentTimeSubscription) this.currentTimeSubscription.remove();
+  if (this.playingSubscription) this.playingSubscription.remove();
 };
 
 // ios only
